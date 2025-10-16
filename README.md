@@ -1,12 +1,14 @@
-# EffectConnect Marketplaces - Prestashop 8 plugin
+# EffectConnect Marketplaces - Prestashop plugin
 
-Use this plugin to connect your Prestashop 8 webshop with EffectConnect Marketplaces. For more information about EffectConnect, go to the [EffectConnect website](https://www.effectconnect.com "EffectConnect Website").
+Use this plugin to connect your Prestashop webshop with EffectConnect Marketplaces. For more information about EffectConnect, go to the [EffectConnect website](https://www.effectconnect.com "EffectConnect Website").
 
 **Important: before installing this plugin please contact the EffectConnect sales department via +31(0)852088432 and/or sales@effectconnect.com so we can provide you with a new EffectConnect account.**
 
 ## Install module
 
-1. Download the latest release [effectconnect_marketplaces_x_x_x.zip](https://github.com/EffectConnect/MarketplacesPluginPS8/releases/ "Plugin ZIP") of the plugin.
+Always check the compatibility before installing this plugin.
+
+1. Download the latest release [effectconnect_marketplaces_x_x_x.zip](https://github.com/EffectConnect/MarketplacesPluginPS/releases/ "Plugin ZIP") of the plugin.
 
 2. Upload the ZIP file in your Prestashop Environment (Modules -> Module Manager > Upload a module), select the downloaded file and the installation will start automatically.
 
@@ -54,7 +56,7 @@ Optional (see explanation below):
 */15 * * * * /usr/bin/php73 /home/kpdevelopment/domains/prestashop-1-7-7-1.nl/public_html/bin/console ec:export-tracking-numbers > /home/kpdevelopment/domains/prestashop-1-7-7-1.nl/public_html/modules/effectconnect_marketplaces/data/log/cron_export_tracking_numbers.log
 0 5 * * * /usr/bin/php73 /home/kpdevelopment/domains/prestashop-1-7-7-1.nl/public_html/bin/console ec:clean-files > /home/kpdevelopment/domains/prestashop-1-7-7-1.nl/public_html/modules/effectconnect_marketplaces/data/log/cron_clean_files.log
 ```
-### PHP versions
+### Compatibility
 
 When setting up cron tasks make sure to use the correct PHP version that matches your Prestashop installation:
 
@@ -64,6 +66,8 @@ When setting up cron tasks make sure to use the correct PHP version that matches
 | Prestashop 8.1     | PHP 7.4 - 8.2   |
 | Prestashop 8.1.4+  | PHP 8.0 - 8.2   |
 | Prestashop 9       | PHP 8.1 - 8.4   |
+
+Prestashop 1.7 is no longer actively supported. The last version can be found in the read-only repository of the [EffectConnect Marketplaces - Prestashop 1.7 plugin](https://github.com/EffectConnect/MarketplacesPluginPS17 "EffectConnect Marketplaces - Prestashop 1.7 plugin").
 
 You can check your default PHP version by running `php -v` in your SSH console.
 If the default version does not match the table above, ask your server administrator how to run commands in another PHP version. 
