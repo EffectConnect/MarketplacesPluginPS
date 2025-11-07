@@ -36,6 +36,10 @@ final class AdminConnectionGridQueryBuilder extends AbstractDoctrineQueryBuilder
                 $qb->andWhere("rec.$filterName LIKE :$filterName");
                 $qb->setParameter($filterName, '%' . $filterValue . '%');
                 continue;
+            } elseif('name' === $filterName) { // Prevent ambiguous 'name' in WHERE
+                $qb->andWhere("rec.$filterName LIKE :$filterName");
+                $qb->setParameter($filterName, '%' . $filterValue . '%');
+                continue;
             }
             $qb->andWhere("$filterName LIKE :$filterName");
             $qb->setParameter($filterName, '%' . $filterValue . '%');

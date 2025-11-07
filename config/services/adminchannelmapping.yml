@@ -1,0 +1,143 @@
+services:
+
+  # Grid definition factory
+  effectconnect_marketplaces.adminchannelmapping.grid_definition_factory:
+    class: 'EffectConnect\Marketplaces\Grid\AdminChannelMappingGridDefinitionFactory'
+    parent: 'prestashop.core.grid.definition.factory.abstract_grid_definition'
+    arguments:
+      - "@=service('router').generate('admin_common_reset_search', {'controller': 'adminchannelmapping', 'action': 'index'})"
+      - "@=service('router').generate('effectconnect_marketplaces_adminchannelmapping_index')"
+    public: true
+
+  # Grid query builder
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappinggrid.query_builder:
+    class: 'EffectConnect\Marketplaces\Grid\AdminChannelMappingGridQueryBuilder'
+    parent: 'prestashop.core.grid.abstract_query_builder'
+    public: true
+
+  # Grid data provider
+  effectconnect_marketplaces.adminchannelmapping.data_factory:
+    class: 'PrestaShop\PrestaShop\Core\Grid\Data\Factory\DoctrineGridDataFactory'
+    arguments:
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappinggrid.query_builder'
+      - '@prestashop.core.hook.dispatcher'
+      - '@prestashop.core.grid.query.doctrine_query_parser'
+      - 'adminchannelmappinggrid'
+
+  # Grid data decorator
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappinggrid.decorator:
+    class: 'EffectConnect\Marketplaces\Grid\Data\AdminChannelMappingGridDataFactoryDecorator'
+    arguments:
+      - '@effectconnect_marketplaces.adminchannelmapping.data_factory'
+
+  # Grid factory which will use our grid definition factory and data provider services
+  effectconnect_marketplaces.adminchannelmapping.grid_factory:
+    class: 'PrestaShop\PrestaShop\Core\Grid\GridFactory'
+    arguments:
+      - '@effectconnect_marketplaces.adminchannelmapping.grid_definition_factory'
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappinggrid.decorator'
+      - '@prestashop.core.grid.filter.form_factory'
+      - '@prestashop.core.hook.dispatcher'
+
+  # Form
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type:
+    class: 'EffectConnect\Marketplaces\Form\AdminChannelMappingFormType'
+    arguments:
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.choice_provider.channel_choice_provider'
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.choice_provider.connection_choice_provider'
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.choice_provider.payment_module_choice_provider'
+    parent: 'form.type.translatable.aware'
+    public: true
+    tags:
+      - { name: form.type }
+
+  # Form type channel choice provider
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.choice_provider.channel_choice_provider:
+    class: 'EffectConnect\Marketplaces\Form\Type\ChoiceProvider\ChannelChoiceProvider'
+    public: true
+
+  # Form type connection choice provider
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.choice_provider.connection_choice_provider:
+    class: 'EffectConnect\Marketplaces\Form\Type\ChoiceProvider\ConnectionChoiceProvider'
+    public: true
+
+  # Form type payment module choice provider
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.choice_provider.payment_module_choice_provider:
+    class: 'EffectConnect\Marketplaces\Form\Type\ChoiceProvider\PaymentModuleChoiceProvider'
+    public: true
+    arguments:
+      - '@translator'
+      - '@prestashop.adapter.module.payment_module_provider'
+
+  # Channel form type
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.channel_choice_type:
+    class: 'EffectConnect\Marketplaces\Form\Type\ChannelChoiceType'
+    arguments:
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.choice_provider.channel_choice_provider'
+    parent: 'form.type.common_type'
+    public: true
+    tags:
+      - { name: form.type }
+
+  # Connection form type
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.connection_choice_type:
+    class: 'EffectConnect\Marketplaces\Form\Type\ConnectionChoiceType'
+    arguments:
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.choice_provider.connection_choice_provider'
+    parent: 'form.type.common_type'
+    public: true
+    tags:
+      - { name: form.type }
+
+  # Payment module form type
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.payment_module_choice_type:
+    class: 'EffectConnect\Marketplaces\Form\Type\PaymentModuleChoiceType'
+    arguments:
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_type.choice_provider.payment_module_choice_provider'
+    parent: 'form.type.common_type'
+    public: true
+    tags:
+      - { name: form.type }
+
+  # Form DataProvider
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.data_provider:
+    class: 'EffectConnect\Marketplaces\Form\AdminChannelMappingDataProvider'
+    public: true
+
+  # Form DataHandler
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.data_handler:
+    class: 'EffectConnect\Marketplaces\Form\AdminChannelMappingDataHandler'
+    public: true
+
+  # Form Handler
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_handler:
+    class: 'PrestaShop\PrestaShop\Core\Form\IdentifiableObject\Handler\FormHandler'
+    factory: ['@prestashop.core.form.identifiable_object.handler.form_handler_factory', 'create']
+    arguments:
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.data_handler'
+
+  # Form Builder
+  effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_builder:
+    class: 'PrestaShop\PrestaShop\Core\Form\IdentifiableObject\Builder\FormBuilder'
+    factory: ['@prestashop.core.form.builder.form_builder_factory', 'create']
+    arguments:
+      - 'EffectConnect\Marketplaces\Form\AdminChannelMappingFormType'
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.data_provider'
+
+  # Controller
+  EffectConnect\Marketplaces\Controller\AdminChannelMappingController:
+    public: true
+    autowire: true
+    autoconfigure: true
+    class: EffectConnect\Marketplaces\Controller\AdminChannelMappingController
+    arguments:
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_builder'
+      - '@effectconnect_marketplaces.adminchannelmapping.adminchannelmappingform.form_handler'
+      - '@effectconnect_marketplaces.adminchannelmapping.grid_definition_factory'
+      - '@effectconnect_marketplaces.adminchannelmapping.grid_factory'
+      - '@prestashop.core.grid.filter.form_factory'
+      - '@prestashop.core.grid.presenter.grid_presenter'
+      - '@effectconnect.marketplaces.legacy_wrappers.legacy_shop_context'
+      - '@prestashop.module.manager'
+      - '@prestashop.adapter.data_provider.module'
+      - '@translator'

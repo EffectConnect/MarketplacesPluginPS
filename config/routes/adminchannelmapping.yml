@@ -1,0 +1,99 @@
+# Index
+effectconnect_marketplaces_adminchannelmapping_index:
+  path: /effectconnect_marketplaces/channel-mapping
+  methods: [GET]
+  defaults:
+    _controller: 'EffectConnect\Marketplaces\Controller\AdminChannelMappingController::indexAction'
+    _legacy_controller: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_link: 'AdminChannelMappingControllerLegacyClass'
+
+# Search
+effectconnect_marketplaces_adminchannelmapping_search:
+  path: /effectconnect_marketplaces/channel-mapping
+  methods: [POST]
+  defaults:
+    _controller: 'EffectConnect\Marketplaces\Controller\AdminChannelMappingController::searchAction'
+    _legacy_controller: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_link: 'AdminChannelMappingControllerLegacyClass'
+
+# Toggle active
+effectconnect_marketplaces_adminchannelmapping_active_toggle:
+  path: /effectconnect_marketplaces/channel-mapping/toggle-active/{recordId}
+  methods: [POST]
+  defaults:
+    _controller: 'EffectConnect\Marketplaces\Controller\AdminChannelMappingController::toggleActiveAction'
+    _legacy_controller: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_link: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_parameters:
+      id_documenttype: recordId
+  requirements:
+    recordId: \d+
+
+# Delete
+effectconnect_marketplaces_adminchannelmapping_delete:
+  path: /effectconnect_marketplaces/channel-mapping/delete/{recordId}
+  methods: [GET]
+  defaults:
+    _controller: 'EffectConnect\Marketplaces\Controller\AdminChannelMappingController::deleteAction'
+    _legacy_controller: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_link: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_parameters:
+      id_documenttype: recordId
+  requirements:
+    recordId: \d+
+
+# Add
+effectconnect_marketplaces_adminchannelmapping_add:
+  path: /effectconnect_marketplaces/channel-mapping/add
+  methods: [GET]
+  defaults:
+    _controller: 'EffectConnect\Marketplaces\Controller\AdminChannelMappingController::addAction'
+    _legacy_controller: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_link: 'AdminChannelMappingControllerLegacyClass'
+
+# Add (Insert)
+effectconnect_marketplaces_adminchannelmapping_insert:
+  path: /effectconnect_marketplaces/channel-mapping/add
+  methods: [POST]
+  defaults:
+    _controller: 'EffectConnect\Marketplaces\Controller\AdminChannelMappingController::addAction'
+    _legacy_controller: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_link: 'AdminChannelMappingControllerLegacyClass'
+
+# Edit
+effectconnect_marketplaces_adminchannelmapping_edit:
+  path: /effectconnect_marketplaces/channel-mapping/edit/{recordId}
+  methods: [GET]
+  defaults:
+    _controller: 'EffectConnect\Marketplaces\Controller\AdminChannelMappingController::editAction'
+    _legacy_controller: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_link: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_parameters:
+      id_documenttype: recordId
+  requirements:
+    recordId: \d+
+
+# Edit (Update)
+effectconnect_marketplaces_adminchannelmapping_update:
+  path: /effectconnect_marketplaces/channel-mapping/edit/{recordId}
+  methods: [POST]
+  defaults:
+    _controller: 'EffectConnect\Marketplaces\Controller\AdminChannelMappingController::editAction'
+    _legacy_controller: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_link: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_parameters:
+      id_documenttype: recordId
+  requirements:
+    recordId: \d+
+
+# Retrieve channels
+effectconnect_marketplaces_adminchannelmapping_retrieve_channels:
+  path: /effectconnect_marketplaces/channel-mapping/retrieve-channels/{recordId}
+  methods: [GET]
+  defaults:
+    recordId: null
+    _controller: 'EffectConnect\Marketplaces\Controller\AdminChannelMappingController::retrieveChannelsAction'
+    _legacy_controller: 'AdminChannelMappingControllerLegacyClass'
+    _legacy_link: 'AdminChannelMappingControllerLegacyClass'
+  requirements:
+    recordId: \d+

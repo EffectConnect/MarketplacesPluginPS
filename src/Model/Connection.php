@@ -397,6 +397,14 @@ class Connection extends AbstractModel
     }
 
     /**
+     * @return Connection[]
+     */
+    public static function getListAll()
+    {
+        return self::getList();
+    }
+
+    /**
      * @param int $idCarrierOld
      * @param int $idCarrierNew
      */
@@ -412,5 +420,23 @@ class Connection extends AbstractModel
                 // TODO: log
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete()
+    {
+        $deleted = parent::delete();
+        if ($deleted) {
+            // Remove channel mappings and channels that are related to the deleted connection
+            foreach (ChannelConnection::getListByIdConnection($this->id) as $channelConnection) {
+                $channelConnection->delete();
+            }
+            foreach (ChannelMapping::getListByIdConnection($this->id) as $channelConnection) {
+                $channelConnection->delete();
+            }
+        }
+        return $deleted;
     }
 }

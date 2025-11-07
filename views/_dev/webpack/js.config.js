@@ -6,8 +6,8 @@ let plugins = [];
 
 let js_config = {
   entry: {
-    adminconnectioncontroller: [
-      './js/adminconnectioncontroller.js'
+    adminoverviewcontroller: [
+      './js/adminoverviewcontroller.js'
     ]
   },
   output: {

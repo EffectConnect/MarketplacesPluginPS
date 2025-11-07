@@ -10,6 +10,9 @@ use EffectConnect\Marketplaces\Enums\ConfigurationKeys;
 use EffectConnect\Marketplaces\Manager\CarrierManager;
 use EffectConnect\Marketplaces\Manager\TabManager;
 use EffectConnect\Marketplaces\Manager\TranslationManager;
+use EffectConnect\Marketplaces\Model\Channel;
+use EffectConnect\Marketplaces\Model\ChannelConnection;
+use EffectConnect\Marketplaces\Model\ChannelMapping;
 use EffectConnect\Marketplaces\Model\Connection;
 use EffectConnect\Marketplaces\Model\OfferExportQueue;
 use EffectConnect\Marketplaces\Model\TrackingExportQueue;
@@ -39,7 +42,7 @@ class EffectConnect_Marketplaces extends Module
     {
         $this->name                     = 'effectconnect_marketplaces';
         $this->tab                      = 'market_place';
-        $this->version                  = '4.1.1';
+        $this->version                  = '4.2.0';
         $this->author                   = 'EffectConnect';
         $this->need_instance            = 1;
         $this->bootstrap                = true;
@@ -75,6 +78,9 @@ class EffectConnect_Marketplaces extends Module
                 !Connection::createDbTable()
                 || !TrackingExportQueue::createDbTable()
                 || !OfferExportQueue::createDbTable()
+                || !Channel::createDbTable()
+                || !ChannelMapping::createDbTable()
+                || !ChannelConnection::createDbTable()
             ) {
                 $this->_errors[] = 'Error while creating database tables';
                 return false;
@@ -84,6 +90,7 @@ class EffectConnect_Marketplaces extends Module
             if (
                 !TabManager::addParentTab('EffectConnect', $this->trans('EffectConnect', [], 'Modules.Effectconnectmarketplaces.Admin'))
                 || !TabManager::addChildTab('AdminConnectionControllerLegacyClass', 'Connections', $this->trans('Connections', [], 'Modules.Effectconnectmarketplaces.Admin'))
+                || !TabManager::addChildTab('AdminChannelMappingControllerLegacyClass', 'Channel mapping', $this->trans('Channel mapping', [], 'Modules.Effectconnectmarketplaces.Admin'))
                 || !TabManager::addChildTab('AdminLogControllerLegacyClass', 'Logs', $this->trans('Logs', [], 'Modules.Effectconnectmarketplaces.Admin'))
             ) {
                 $this->_errors[] = 'Error while adding admin tabs';
@@ -130,6 +137,9 @@ class EffectConnect_Marketplaces extends Module
                 !Connection::removeDbTable()
                 || !TrackingExportQueue::removeDbTable()
                 || !OfferExportQueue::removeDbTable()
+                || !Channel::removeDbTable()
+                || !ChannelMapping::removeDbTable()
+                || !ChannelConnection::removeDbTable()
             ) {
                 $this->_errors[] = 'Error while removing database tables';
                 return false;
@@ -139,6 +149,7 @@ class EffectConnect_Marketplaces extends Module
             if (
                 !TabManager::removeTab('AdminLogControllerLegacyClass')
                 || !TabManager::removeTab('AdminConnectionControllerLegacyClass')
+                || !TabManager::removeTab('AdminChannelMappingControllerLegacyClass')
                 || !TabManager::removeParentTab()
             ) {
                 $this->_errors[] = 'Error while removing admin tabs';

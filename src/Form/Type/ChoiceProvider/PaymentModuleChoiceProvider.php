@@ -51,6 +51,7 @@ final class PaymentModuleChoiceProvider implements FormChoiceProviderInterface
             $choices[$paymentModule->attributes->get('displayName')] = $moduleId; // TODO: are these module names translatable?
         }
 
+        ksort($choices);
         return $choices;
     }
 

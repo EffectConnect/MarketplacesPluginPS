@@ -30,6 +30,7 @@ final class EmployeeChoiceProvider implements FormChoiceProviderInterface
             $employeesChoices[$this->getName($employeeArray)] = $employeeArray['id_employee'];
         }
 
+        ksort($employeesChoices);
         return $employeesChoices;
     }
 

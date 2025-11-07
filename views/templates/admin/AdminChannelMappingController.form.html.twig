@@ -1,0 +1,119 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+{% import '@PrestaShop/Admin/macros.html.twig' as ps %}
+
+{% trans_default_domain "Modules.Effectconnectmarketplaces.Admin" %}
+
+{% block content %}
+
+{% if not isAllOrOnlyShopContext %}
+
+  <div class="alert alert-warning" role="alert">
+    <p class="alert-text">{{ 'Please select \'All shops\' in the shop context to edit channel mappings.'|trans({}, 'Modules.Effectconnectmarketplaces.Admin') }}</p>
+  </div>
+
+{% elseif not hasConnections %}
+
+  <div class="alert alert-warning" role="alert">
+    <p class="alert-text">
+      {{ 'Before adding channel mappings, make sure to add a connection first.'|trans({}, 'Modules.Effectconnectmarketplaces.Admin') }}
+      <a href="{{ path('effectconnect_marketplaces_adminconnection_add') }}">{{ 'Add connection'|trans({}, 'Modules.MyModule.Admin') }}</a>
+    </p>
+  </div>
+
+{% else %}
+
+  {{ form_start(AdminChannelMappingForm) }}
+
+      <div class="card">
+        <h3 class="card-header">
+          {{ 'Channel mapping details'|trans({}, 'Modules.Effectconnectmarketplaces.Admin') }}
+        </h3>
+        <div class="card-body">
+          <div class="card-text">
+            <div class="form-group row">
+              <label class="form-control-label">
+                {{ AdminChannelMappingForm.is_active.vars.label }}
+              </label>
+              <div class="col-sm">
+                {{ form_errors(AdminChannelMappingForm.is_active) }}
+                {{ form_widget(AdminChannelMappingForm.is_active) }}
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="form-control-label">
+                {{ AdminChannelMappingForm.id_connection.vars.label }}
+              </label>
+              <div class="col-sm">
+                {{ form_errors(AdminChannelMappingForm.id_connection) }}
+                {{ form_widget(AdminChannelMappingForm.id_connection) }}
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="form-control-label">
+                {{ AdminChannelMappingForm.id_channel.vars.label }}
+              </label>
+              <div class="col-sm">
+                {{ form_errors(AdminChannelMappingForm.id_channel) }}
+                {{ form_widget(AdminChannelMappingForm.id_channel) }}
+                <small class="form-text">{{ 'Only channels that are accessible by the selected connection can be chosen.'|trans({}, 'Modules.Effectconnectmarketplaces.Admin') }}</small>
+                <a href="{{ path('effectconnect_marketplaces_adminchannelmapping_retrieve_channels', { recordId: AdminChannelMappingForm.vars.data.id }) }}" class="btn btn-secondary" style="margin-top: 10px;">
+                  {{ 'Refresh channel list'|trans({}, 'Modules.Effectconnectmarketplaces.Admin') }}
+                </a>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="form-control-label">
+                {{ AdminChannelMappingForm.order_import_id_payment_module.vars.label }}
+              </label>
+              <div class="col-sm">
+                {{ form_errors(AdminChannelMappingForm.order_import_id_payment_module) }}
+                {{ form_widget(AdminChannelMappingForm.order_import_id_payment_module) }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="d-flex justify-content-between">
+            <a href="{{ path('effectconnect_marketplaces_adminchannelmapping_index') }}" class="btn btn-outline-secondary">
+              {{ 'Cancel'|trans({}, 'Admin.Actions') }}
+            </a>
+            <button class="btn btn-primary">{{ 'Save'|trans({}, 'Admin.Actions') }}</button>
+          </div>
+        </div>
+      </div>
+
+  {{ form_widget(AdminChannelMappingForm.id_channel_mapping) }}
+  {{ form_rest(AdminChannelMappingForm) }}
+  {{ form_end(AdminChannelMappingForm) }}
+
+{% endif %}
+
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script>
+    $('#admin_channel_mapping_form_id_connection').change(function () {
+      updateChannelList(this);
+    }).trigger('change');
+
+    function updateChannelList(e)
+    {
+      let idConnection = $(e).val();
+      let groupOptions = $("#admin_channel_mapping_form_id_channel option");
+      updateList(idConnection, groupOptions);
+    }
+
+    function updateList(idConnection, optionElements)
+    {
+      optionElements.prop('disabled', false);
+      let optionElementsToDisable = optionElements.filter(function() {
+        let connectionIds = $(this).data('connection-id');
+        // Disable list element if it does not contain the given connection ID
+        return !Array.isArray(connectionIds) || connectionIds.length === 0 || !connectionIds.map(id => parseInt(id, 10)).includes(parseInt(idConnection, 10));
+      });
+      optionElementsToDisable.prop('disabled', true);
+      optionElementsToDisable.prop('selected', false);
+    }
+  </script>
+{% endblock %}
