@@ -11,7 +11,7 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_2_0($object)
 {
-    return TabManager::addChildTab('AdminConnectionControllerLegacyClass', 'Connections', 'Connections')
+    return TabManager::addChildTab('AdminChannelMappingControllerLegacyClass', 'Channel mapping', 'Channel mapping')
         && Channel::createDbTable()
         && ChannelMapping::createDbTable()
         && ChannelConnection::createDbTable();
