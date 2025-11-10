@@ -1,0 +1,41 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% trans_default_domain "Modules.Effectconnectmarketplaces.Admin" %}
+
+{% if hasConnections %}
+{%
+set layoutHeaderToolbarBtn = {
+  'add': {
+    'href': path('effectconnect_marketplaces_adminchannelmapping_add'),
+    'desc': 'Add channel mapping'|trans({}, 'Modules.Effectconnectmarketplaces.Admin'),
+    'icon': 'add_circle_outline'
+  }
+}
+%}
+{% endif %}
+
+{% block content %}
+  <div class="row">
+    <div class="col">
+
+      {% if not hasConnections %}
+
+      <div class="alert alert-warning" role="alert">
+        <p class="alert-text">
+          {{ 'Before adding channel mappings, make sure to add a connection first.'|trans({}, 'Modules.Effectconnectmarketplaces.Admin') }}
+          <a href="{{ path('effectconnect_marketplaces_adminconnection_add') }}">{{ 'Add connection'|trans({}, 'Modules.MyModule.Admin') }}</a>
+        </p>
+      </div>
+
+      {% else %}
+        {% include '@PrestaShop/Admin/Common/Grid/grid_panel.html.twig' with {'grid': AdminChannelMappingGrid} %}
+      {% endif %}
+
+    </div>
+  </div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="{{ asset('../modules/effectconnect_marketplaces/views/assets/js/adminoverviewcontroller.js') }}"></script>
+{% endblock %}

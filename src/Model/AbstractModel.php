@@ -18,7 +18,7 @@ class AbstractModel extends ObjectModel
      * @param int $limit
      * @return array
      */
-    protected static function getList(string $where, int $limit = 0)
+    protected static function getList(string $where = '1', int $limit = 0)
     {
         try {
             $list = Db::getInstance()->executeS('

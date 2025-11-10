@@ -15,6 +15,8 @@ use EffectConnect\Marketplaces\Enums\LoggerProcess;
 use EffectConnect\Marketplaces\Exception\InitContextFailedException;
 use EffectConnect\Marketplaces\Exception\OrderImportFailedException;
 use EffectConnect\Marketplaces\Helper\LoggerHelper;
+use EffectConnect\Marketplaces\Model\Channel;
+use EffectConnect\Marketplaces\Model\ChannelMapping;
 use EffectConnect\Marketplaces\Model\TrackingExportQueue;
 use EffectConnect\Marketplaces\Service\InitContext;
 use EffectConnect\PHPSdk\Core\Model\Filter\HasStatusFilter;
@@ -108,6 +110,7 @@ class OrderImportTransformer extends AbstractTransformer
             return false;
         }
 
+        $channelMapping      = $this->getChannelMapping($ecOrder);
         $customer            = $this->processCustomer($ecOrder);
         $invoiceAddress      = $this->processAddress($ecOrder->getBillingAddress(), $customer);
         $deliveryAddress     = $this->processAddress($ecOrder->getShippingAddress(), $customer);
@@ -115,7 +118,7 @@ class OrderImportTransformer extends AbstractTransformer
         $cart                = $this->processCart($ecOrder, $customer, $invoiceAddress, $deliveryAddress, $currency);
         $cart                = $this->processProducts($ecOrder, $cart, $deliveryAddress);
         $cart                = $this->processCarrier($cart);
-        $paymentModule       = $this->processPayment();
+        $paymentModule       = $this->processPayment($ecOrder, $channelMapping);
         $order               = $this->processOrder($ecOrder, $cart, $paymentModule);
         $this->saveOrderIdentifiers($order, $ecOrder);
 
@@ -510,15 +513,28 @@ class OrderImportTransformer extends AbstractTransformer
     }
 
     /**
+     * @param EffectConnectOrder $order
+     * @param ChannelMapping|null $channelMapping
      * @return PaymentModule
      * @throws OrderImportFailedException
      */
-    protected function processPayment()
+    protected function processPayment(EffectConnectOrder $order, ChannelMapping $channelMapping = null)
     {
+        if ($channelMapping instanceof ChannelMapping) {
+            $paymentModuleId = $channelMapping->order_import_id_payment_module;
+            $this->_logger->info('Order ' . $order->getIdentifiers()->getEffectConnectNumber() . ' - used channel mapping ' . $channelMapping->id . ' - payment module ' . $paymentModuleId . '.', [
+                'process'    => static::LOGGER_PROCESS,
+                'connection' => [
+                    'id' => $this->getConnection()->id
+                ]
+            ]);
+        } else {
+            $paymentModuleId = $this->getConnection()->order_import_id_payment_module;
+        }
         /** @var PaymentModule $paymentModule */
-        $paymentModule = Module::getInstanceById($this->getConnection()->order_import_id_payment_module);
+        $paymentModule = Module::getInstanceById($paymentModuleId);
         if ($paymentModule === false || !($paymentModule instanceof PaymentModule)) {
-            throw new OrderImportFailedException($this->getConnection()->id, 'Payment module with ID ' . $this->getConnection()->order_import_id_payment_module . ' failed to init');
+            throw new OrderImportFailedException($this->getConnection()->id, 'Payment module with ID ' . $paymentModuleId . ' failed to init');
         }
 
         return $paymentModule;
@@ -746,5 +762,20 @@ class OrderImportTransformer extends AbstractTransformer
         return preg_replace_callback('~\.([^ ])~', function ($matches) {
             return '. ' . $matches[1];
         }, $name);
+    }
+
+    /**
+     * Get (optional) channel mapping for current channel/connection.
+     *
+     * @param EffectConnectOrder $order
+     * @return ChannelMapping|null
+     */
+    protected function getChannelMapping(EffectConnectOrder $order)
+    {
+        $channel = Channel::findByEcChannelId($order->getChannelInfo()->getId());
+        if ($channel instanceof Channel) {
+            return ChannelMapping::getActiveByIdConnectionAndIdChannel($this->getConnection()->id, $channel->id);
+        }
+        return null;
     }
 }

@@ -45,6 +45,7 @@ class CarrierChoiceProvider
             $carriersChoices[$carrierArray['name']] = $carrierArray['id_carrier'];
         }
 
+        ksort($carriersChoices);
         return $carriersChoices;
     }
 

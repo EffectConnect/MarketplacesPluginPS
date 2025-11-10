@@ -46,6 +46,7 @@ class GroupChoiceProvider implements FormChoiceProviderInterface
             $groupChoices[$groupArray['name']] = $groupArray['id_group'];
         }
 
+        ksort($groupChoices);
         return $groupChoices;
     }
 
