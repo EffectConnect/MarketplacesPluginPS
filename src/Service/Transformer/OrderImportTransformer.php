@@ -774,7 +774,7 @@ class OrderImportTransformer extends AbstractTransformer
     {
         $channel = Channel::findByEcChannelId($order->getChannelInfo()->getId());
         if ($channel instanceof Channel) {
-            return ChannelMapping::getByIdConnectionAndIdChannel($this->getConnection()->id, $channel->id);
+            return ChannelMapping::getActiveByIdConnectionAndIdChannel($this->getConnection()->id, $channel->id);
         }
         return null;
     }

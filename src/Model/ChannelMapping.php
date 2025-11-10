@@ -99,9 +99,9 @@ class ChannelMapping extends AbstractModel
      * @param int $idChannel
      * @return ChannelMapping|null
      */
-    public static function getByIdConnectionAndIdChannel(int $idConnection, int $idChannel)
+    public static function getActiveByIdConnectionAndIdChannel(int $idConnection, int $idChannel)
     {
-        $where = '`id_channel` = ' . $idChannel . ' AND `id_connection` = ' . $idConnection;
+        $where = '`id_channel` = ' . $idChannel . ' AND `id_connection` = ' . $idConnection . ' AND `is_active` = 1';
         $list = self::getList($where);
         if (count($list) === 1) {
             return $list[0];
