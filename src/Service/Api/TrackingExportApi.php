@@ -90,21 +90,31 @@ class TrackingExportApi extends AbstractApi
                 'id' => $connection->id
             ]
         ]);
-        foreach ($trackingNumbersToExport as $trackingNumberToExport)
+        $trackingNumberIdsToExport = array_column($trackingNumbersToExport, 'id');
+        foreach ($trackingNumberIdsToExport as $trackingNumberIdToExport)
         {
+            // The $trackingNumbersToExport list could be outdated already, since multiple trackingExportCall calls
+            // could have been executed by now, and in the meantime one of the orders within trackingExportCall could be
+            // given a T&T code.
+            $trackingNumberToExport = new TrackingExportQueue($trackingNumberIdToExport);
+
             // Save that we are exporting this tracking code to prevent other cronjobs to process the same item.
             // Bad luck if the export fails, we will not try to do this again. All tracking items we export (either
             // by order state 'shipped' or when a tracking number was added) will get the 'shipped' status in
             // EffectConnect. Adding a tracking number (and carrier) to the order update is optional.
             // Each type of export is done once (set EC order to 'shipped' and add tracking number - we won't do
             // any updates).
-            $trackingNumberToExport->shipped_exported_at = date('Y-m-d H:i:s', time());
-            $trackingNumberToExport->is_shipped          = 1;
+            $fieldsToUpdate = [
+                'shipped_exported_at' => date('Y-m-d H:i:s', time()),
+                'is_shipped'          => 1,
+            ];
             if ($trackingNumberToExport->carrier_name !== null || $trackingNumberToExport->tracking_number !== null) {
-                $trackingNumberToExport->tracking_exported_at = date('Y-m-d H:i:s', time());
+                $fieldsToUpdate['tracking_exported_at'] = date('Y-m-d H:i:s', time());
             }
             try {
-                $trackingNumberToExport->save();
+                // Prevent overwriting whole record that could be outdated, in the meantime a T&T number could be added
+                // to the orderline.
+                TrackingExportQueue::updateFields($trackingNumberToExport->id, $fieldsToUpdate);
             } catch (PrestaShopException $e) {
                 $this->_logger->error('Failed to mark tracking number as exported. Skipped current tracking export.', [
                     'process'         => static::LOGGER_PROCESS,

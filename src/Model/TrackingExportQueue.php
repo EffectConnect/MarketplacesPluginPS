@@ -329,4 +329,18 @@ class TrackingExportQueue extends AbstractModel
 
         return $result;
     }
+
+    /**
+     * @param int $id
+     * @param array $fieldsToUpdate
+     * @return bool
+     */
+    public static function updateFields(int $id, array $fieldsToUpdate)
+    {
+        try {
+            return Db::getInstance()->update(static::$definition['table'], $fieldsToUpdate, static::$definition['primary'] . ' = ' . intval($id));
+        } catch (PrestaShopDatabaseException $e) {
+            return false;
+        }
+    }
 }
