@@ -171,6 +171,7 @@ class CatalogExportTransformer extends AbstractTransformer
         // TODO: check for valid shop id (and languages)?
         $this->_processedEANs = [];
 
+        $this->disableModelCaches();
         $this->init($connection);
         $this->loadFeatureData();
         $this->loadImageType();
@@ -267,10 +268,12 @@ class CatalogExportTransformer extends AbstractTransformer
                 $totalProductCount++;
             }
 
+            $this->cleanupPrestaShopAfterExportBatch();
             $page += static::PAGE_SIZE;
         }
         while (count($result->getProducts()) > 0);
 
+        $this->enableModelCaches();
         $xmlHelper->endTransaction();
 
         // Don't return file path if it contains no products.
@@ -1437,5 +1440,71 @@ class CatalogExportTransformer extends AbstractTransformer
         ];
 
         return $attributesExport;
+    }
+
+    /**
+     * @return void
+     */
+    private function cleanupPrestaShopAfterExportBatch(): void
+    {
+        foreach ($this->getCacheSensitiveClasses() as $className) {
+            if (class_exists($className) && method_exists($className, 'resetStaticCache')) {
+                $className::resetStaticCache();
+            }
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function disableModelCaches(): void
+    {
+        foreach ($this->getCacheSensitiveClasses() as $className) {
+            if (!class_exists($className)) {
+                continue;
+            }
+
+            if (method_exists($className, 'disableCache')) {
+                $className::disableCache();
+            }
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function enableModelCaches(): void
+    {
+        foreach ($this->getCacheSensitiveClasses() as $className) {
+            if (!class_exists($className)) {
+                continue;
+            }
+
+            if (method_exists($className, 'enableCache')) {
+                $className::enableCache();
+            }
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getCacheSensitiveClasses(): array
+    {
+        return [
+            'Product',
+            'ProductAttribute',
+            'Combination',
+            'Category',
+            'SpecificPrice',
+            'StockAvailable',
+            'Feature',
+            'FeatureValue',
+            'Attribute',
+            'AttributeGroup',
+            'Image',
+            'Manufacturer',
+            'Supplier',
+        ];
     }
 }
