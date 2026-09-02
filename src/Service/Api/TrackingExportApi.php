@@ -168,7 +168,7 @@ class TrackingExportApi extends AbstractApi
      * @throws InvalidPropertyValueException
      * @throws SdkCoreNotInitializedException
      */
-    protected function trackingExportCall(string $effectConnectNumber, array $effectConnectLineIds, string $carrier = null, string $trackingNumber = null)
+    protected function trackingExportCall(string $effectConnectNumber, array $effectConnectLineIds, ?string $carrier = null, ?string $trackingNumber = null)
     {
         $orderCall = $this->getSdkCore()->OrderCall();
 

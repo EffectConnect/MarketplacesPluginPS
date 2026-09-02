@@ -42,7 +42,7 @@ class EffectConnect_Marketplaces extends Module
     {
         $this->name                     = 'effectconnect_marketplaces';
         $this->tab                      = 'market_place';
-        $this->version                  = '4.2.2';
+        $this->version                  = '4.2.3';
         $this->author                   = 'EffectConnect';
         $this->need_instance            = 1;
         $this->bootstrap                = true;

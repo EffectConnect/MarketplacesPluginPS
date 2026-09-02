@@ -107,7 +107,7 @@ class OfferExportTransformer extends CatalogExportTransformer
      * @param int|null $idCombination
      * @return array
      */
-    protected function getProductOptionArray(string $identifier, string $sku, string $ean, float $wholeSalePrice, Product $product, int $idCombination = null)
+    protected function getProductOptionArray(string $identifier, string $sku, string $ean, float $wholeSalePrice, Product $product, ?int $idCombination = null)
     {
         $productOptionExport = [
             'identifier' => $identifier,

@@ -518,7 +518,7 @@ class OrderImportTransformer extends AbstractTransformer
      * @return PaymentModule
      * @throws OrderImportFailedException
      */
-    protected function processPayment(EffectConnectOrder $order, ChannelMapping $channelMapping = null)
+    protected function processPayment(EffectConnectOrder $order, ?ChannelMapping $channelMapping = null)
     {
         if ($channelMapping instanceof ChannelMapping) {
             $paymentModuleId = $channelMapping->order_import_id_payment_module;

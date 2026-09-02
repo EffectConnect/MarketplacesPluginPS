@@ -418,7 +418,7 @@ class CatalogExportTransformer extends AbstractTransformer
      * @param int|null $idCombination
      * @return array
      */
-    protected function getProductOptionArray(string $identifier, string $sku, string $ean, float $wholeSalePrice, Product $product, int $idCombination = null)
+    protected function getProductOptionArray(string $identifier, string $sku, string $ean, float $wholeSalePrice, Product $product, ?int $idCombination = null)
     {
         // Product titles (by language)
         $titles = $this->getProductTitles($idCombination);
@@ -659,7 +659,7 @@ class CatalogExportTransformer extends AbstractTransformer
      * @return mixed
      * @throws ProductLoadException
      */
-    protected function getProductAttributesResumeLanguageData(int $idLang, int $idCombination = null)
+    protected function getProductAttributesResumeLanguageData(int $idLang, ?int $idCombination = null)
     {
         if (is_null($idCombination)) {
             if (!isset($this->_productAttributesResumeLanguageData[$idLang])) {
@@ -727,7 +727,7 @@ class CatalogExportTransformer extends AbstractTransformer
      * @param int|null $idCombination
      * @return array
      */
-    protected function getProductTitles(int $idCombination = null)
+    protected function getProductTitles(?int $idCombination = null)
     {
         $titles = [];
 
@@ -807,7 +807,7 @@ class CatalogExportTransformer extends AbstractTransformer
      * @param int|null $idCombination
      * @return array
      */
-    protected function getProductUrls(int $idCombination = null)
+    protected function getProductUrls(?int $idCombination = null)
     {
         $urls = [];
 
@@ -840,7 +840,7 @@ class CatalogExportTransformer extends AbstractTransformer
      * @param int|null $idCombination
      * @return array
      */
-    protected function getProductAttributes(Product $product, int $idCombination = null)
+    protected function getProductAttributes(Product $product, ?int $idCombination = null)
     {
         // Get fixed attributes
         $attributesExport = array_merge(
@@ -1065,7 +1065,7 @@ class CatalogExportTransformer extends AbstractTransformer
      * @param int|null $idCombination
      * @return float
      */
-    protected function getPrice(Product $product, int $idCombination = null)
+    protected function getPrice(Product $product, ?int $idCombination = null)
     {
         $useReduction = true;
         if (!$this->getConnection()->catalog_export_special_price) {
@@ -1081,7 +1081,7 @@ class CatalogExportTransformer extends AbstractTransformer
      * @param int|null $idCombination
      * @return float|null
      */
-    protected function getPriceOriginal(Product $product, int $idCombination = null)
+    protected function getPriceOriginal(Product $product, ?int $idCombination = null)
     {
         if (!$this->getConnection()->catalog_export_special_price) {
             return null;
@@ -1095,7 +1095,7 @@ class CatalogExportTransformer extends AbstractTransformer
      * @param float|null $price
      * @return float|null
      */
-    protected function convertPriceToEuro(float $price = null)
+    protected function convertPriceToEuro(?float $price = null)
     {
         if (is_null($price)) {
             return $price;
@@ -1133,7 +1133,7 @@ class CatalogExportTransformer extends AbstractTransformer
      * @param int|null $idCombination
      * @return int
      */
-    protected function getStock(Product $product, int $idCombination = null)
+    protected function getStock(Product $product, ?int $idCombination = null)
     {
         return max(0, min(Product::getQuantity($product->id, $idCombination), 9999));
     }
@@ -1338,7 +1338,7 @@ class CatalogExportTransformer extends AbstractTransformer
      * @param int|null $idCombination
      * @return array
      */
-    protected function getProductAttributeCombinations(Product $product, int $idCombination = null)
+    protected function getProductAttributeCombinations(Product $product, ?int $idCombination = null)
     {
         $attributesExport = [];
 

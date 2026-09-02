@@ -194,7 +194,7 @@ class AbstractTransformer
      * @param int|null $idCombination
      * @return string
      */
-    protected function getProductIdentifier(int $idProduct, int $idCombination = null)
+    protected function getProductIdentifier(int $idProduct, ?int $idCombination = null)
     {
         $identifier = strval($idProduct);
         if ($idCombination !== null) {

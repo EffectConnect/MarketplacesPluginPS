@@ -55,9 +55,9 @@ class CategoryLanguage
      * @param int|null $idLang
      * @return Category
      */
-    public function getCategory(int $idLang = null)
+    public function getCategory(?int $idLang = null)
     {
-        if (isset($this->_categoryData[$idLang])) {
+        if ($idLang !== null && isset($this->_categoryData[$idLang])) {
             return $this->_categoryData[$idLang];
         }
         return reset($this->_categoryData);
