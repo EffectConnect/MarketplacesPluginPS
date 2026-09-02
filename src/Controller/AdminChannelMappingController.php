@@ -273,7 +273,7 @@ class AdminChannelMappingController extends CompatibleAdminController
      * @param int|null $recordId
      * @return RedirectResponse
      */
-    public function retrieveChannelsAction(int $recordId = null)
+    public function retrieveChannelsAction(?int $recordId = null)
     {
         // Fetch channels
         foreach (Connection::getListAll() as $connection) {

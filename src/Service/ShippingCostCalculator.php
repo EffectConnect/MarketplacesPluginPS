@@ -21,7 +21,7 @@ class ShippingCostCalculator
      * @param bool $useTax
      * @return float
      */
-    public static function calculate(EffectConnectOrder $order, int $idCarrier = null, bool $useTax = true)
+    public static function calculate(EffectConnectOrder $order, ?int $idCarrier = null, bool $useTax = true)
     {
         $feeAmount = $feeAmountExcludingTax = 0;
         if ($idCarrier > 0)
