@@ -3,8 +3,8 @@
 namespace EffectConnect\Marketplaces\Manager;
 
 use Exception;
+use PrestaShop\PrestaShop\Core\Cache\Clearer\CacheClearerInterface;
 use PrestaShopBundle\Exception\InvalidLanguageException;
-use PrestaShopBundle\Service\Cache\Refresh;
 use PrestaShopBundle\Service\TranslationService;
 use PrestaShopBundle\Translation\DomainNormalizer;
 use RuntimeException;
@@ -31,18 +31,18 @@ class TranslationManager
     protected $_translationService;
 
     /**
-     * @var Refresh
+     * @var CacheClearerInterface
      */
     protected $_cacheRefresh;
 
     /**
      * TranslationManager constructor.
      * @param TranslationService $translationService
-     * @param Refresh $cacheRefresh
+     * @param CacheClearerInterface $cacheRefresh
      */
     public function __construct(
         TranslationService $translationService,
-        Refresh $cacheRefresh
+        CacheClearerInterface $cacheRefresh
     ) {
         $this->_translationService = $translationService;
         $this->_cacheRefresh       = $cacheRefresh;
@@ -91,8 +91,7 @@ class TranslationManager
 
         // Refresh cache.
         try {
-            $this->_cacheRefresh->addCacheClear();
-            $this->_cacheRefresh->execute();
+            $this->_cacheRefresh->clear();
         } catch (Exception $exception) {
             return false;
         }
