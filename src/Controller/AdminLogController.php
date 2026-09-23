@@ -6,6 +6,7 @@ use EffectConnect\Marketplaces\Exception\FileZipCreationFailedException;
 use EffectConnect\Marketplaces\Helper\FileCleanHelper;
 use EffectConnect\Marketplaces\Helper\FileDownloadHelper;
 use EffectConnect\Marketplaces\Helper\FilePathInterface;
+use EffectConnect\Marketplaces\Manager\TranslationManager;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\RedirectResponse;

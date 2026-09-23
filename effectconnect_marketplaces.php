@@ -42,7 +42,7 @@ class EffectConnect_Marketplaces extends Module
     {
         $this->name                     = 'effectconnect_marketplaces';
         $this->tab                      = 'market_place';
-        $this->version                  = '4.2.3';
+        $this->version                  = '4.2.4';
         $this->author                   = 'EffectConnect';
         $this->need_instance            = 1;
         $this->bootstrap                = true;
@@ -263,7 +263,7 @@ class EffectConnect_Marketplaces extends Module
     {
         try {
             $translationService  = $this->get('prestashop.service.translation');
-            $cacheRefreshService = $this->get('prestashop.cache.refresh');
+            $cacheRefreshService = $this->get('prestashop.core.cache.clearer.cache_clearer_chain');
             $translationManager  = new TranslationManager($translationService, $cacheRefreshService);
             return $translationManager->addTranslations();
         } catch (Exception $e) {
@@ -280,7 +280,7 @@ class EffectConnect_Marketplaces extends Module
     {
         try {
             $translationService  = $this->get('prestashop.service.translation');
-            $cacheRefreshService = $this->get('prestashop.cache.refresh');
+            $cacheRefreshService = $this->get('prestashop.core.cache.clearer.cache_clearer_chain');
             $translationManager  = new TranslationManager($translationService, $cacheRefreshService);
             return $translationManager->removeTranslations();
         } catch (Exception $e) {

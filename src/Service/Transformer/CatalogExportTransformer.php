@@ -10,6 +10,7 @@ use EffectConnect\Marketplaces\Helper\LoggerHelper;
 use EffectConnect\Marketplaces\Helper\ProductImageTypeHelper;
 use EffectConnect\Marketplaces\Helper\StringHelper;
 use EffectConnect\Marketplaces\Helper\VenditHelper;
+use EffectConnect\Marketplaces\LegacyWrappers\SupplierService;
 use EffectConnect\Marketplaces\Model\VenditWarehouse;
 use EffectConnect\Marketplaces\Service\InitContext;
 use EffectConnect\Marketplaces\Service\ProductSearch\ProductSearchProvider;
@@ -30,6 +31,8 @@ use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use EffectConnect\Marketplaces\Service\ProductSearch\ProductSearchContext;
 use PrestaShop\PrestaShop\Core\Product\Search\ProductSearchQuery;
 use Product;
+use ProductSupplier;
+use Supplier;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -74,6 +77,11 @@ class CatalogExportTransformer extends AbstractTransformer
     protected $_featureService;
 
     /**
+     * @var SupplierService
+     */
+    protected $_supplierService;
+
+    /**
      * @var CategoryLanguage
      */
     protected $_categoryLanguage;
@@ -105,6 +113,11 @@ class CatalogExportTransformer extends AbstractTransformer
      * @var array
      */
     protected $_featureLanguageData = [];
+
+    /**
+     * @var array
+     */
+    protected $_supplierLanguageData = [];
 
     /**
      * @var PriceFormatter
@@ -145,6 +158,7 @@ class CatalogExportTransformer extends AbstractTransformer
         Configuration $configuration,
         ProductService $productService,
         FeatureService $featureService,
+        SupplierService $supplierService,
         CategoryLanguage $categoryLanguage,
         ProductSearchProvider $productSearchProvider,
         PriceFormatter $priceFormatter
@@ -152,6 +166,7 @@ class CatalogExportTransformer extends AbstractTransformer
         $this->_configuration         = $configuration;
         $this->_productService        = $productService;
         $this->_featureService        = $featureService;
+        $this->_supplierService       = $supplierService;
         $this->_categoryLanguage      = $categoryLanguage;
         $this->_productSearchProvider = $productSearchProvider;
         $this->_priceFormatter        = $priceFormatter;
@@ -174,6 +189,7 @@ class CatalogExportTransformer extends AbstractTransformer
         $this->disableModelCaches();
         $this->init($connection);
         $this->loadFeatureData();
+        $this->loadSupplierData();
         $this->loadImageType();
         $this->loadVenditWarehouses();
 
@@ -698,6 +714,21 @@ class CatalogExportTransformer extends AbstractTransformer
     /**
      * @return void
      */
+    protected function loadSupplierData()
+    {
+        foreach (array_keys($this->_languageIsoCodeById) as $languageId)
+        {
+            foreach ($this->_supplierService->getSuppliers($languageId) as $supplier)
+            {
+                $supplierId = intval($supplier['id_supplier']);
+                $this->_supplierLanguageData[$languageId][$supplierId] = $supplier['name'];
+            }
+        }
+    }
+
+    /**
+     * @return void
+     */
     protected function loadImageType()
     {
         $imageType   = null;
@@ -844,6 +875,7 @@ class CatalogExportTransformer extends AbstractTransformer
     {
         // Get fixed attributes
         $attributesExport = array_merge(
+            $this->getProductAttributeSupplierData($product),
             $this->getProductAttributeAvailableForOrder($product),
             $this->getProductAttributeDimensions($product),
             $this->getProductLanguageAttributes($product),
@@ -1335,6 +1367,129 @@ class CatalogExportTransformer extends AbstractTransformer
 
     /**
      * @param Product $product
+     * @return array
+     */
+    protected function getProductAttributeSupplierData(Product $product)
+    {
+        $attributesExport = [];
+
+        /**
+         * Supplier name attribute
+         */
+
+        $attributeNames = [];
+        foreach ($this->_languages as $languageId => $language)
+        {
+            $attributeNames[] = [
+                '_attributes' => ['language' => $language['iso_code']],
+                '_cdata'      => $this->_translator->trans('Suppliers', [], 'Modules.Effectconnectmarketplaces.Admin', $language['locale']),
+            ];
+        }
+
+        $attributeValuesExport = [];
+        foreach (ProductSupplier::getSupplierCollection($product->id) as $productSupplier) {
+            /** @var ProductSupplier $productSupplier */
+            $idSupplier = $productSupplier->id_supplier;
+
+            $attributeValueNames = [];
+            foreach ($this->_languages as $languageId => $language)
+            {
+                if (!isset($this->_supplierLanguageData[$languageId][$idSupplier])) {
+                    continue;
+                }
+                $supplierName = $this->_supplierLanguageData[$languageId][$idSupplier];
+                if (empty($supplierName)) {
+                    continue;
+                }
+                $attributeValueNames[] = [
+                    '_attributes' => ['language' => $language['iso_code']],
+                    '_cdata'      => $supplierName,
+                ];
+            }
+
+            if (count($attributeValueNames) === 0) {
+                continue;
+            }
+            $attributeValuesExport[] = [
+                'code'   => 'supplier-name-' . $idSupplier,
+                'names' => [
+                    'name' => $attributeValueNames,
+                ],
+            ];
+        }
+
+        if (count($attributeValuesExport) > 0) {
+            $attributesExport['supplier_name'] = [
+                'code' => 'supplier_name',
+                'names' => [
+                    'name' => $attributeNames,
+                ],
+                'values' => [
+                    'value' => $attributeValuesExport,
+                ],
+            ];
+        }
+
+        /**
+         * Default supplier name attribute
+         */
+
+        $idSupplier = $product->id_supplier;
+        if ($idSupplier === 0) {
+            return $attributesExport;
+        }
+
+        $attributeNames = [];
+        foreach ($this->_languages as $languageId => $language)
+        {
+            $attributeNames[] = [
+                '_attributes' => ['language' => $language['iso_code']],
+                '_cdata'      => $this->_translator->trans('Default supplier', [], 'Modules.Effectconnectmarketplaces.Admin', $language['locale']),
+            ];
+        }
+
+        $attributeValuesExport = [];
+        $attributeValueNames = [];
+        foreach ($this->_languages as $languageId => $language)
+        {
+            if (!isset($this->_supplierLanguageData[$languageId][$idSupplier])) {
+                continue;
+            }
+            $supplierName = $this->_supplierLanguageData[$languageId][$idSupplier];
+            if (empty($supplierName)) {
+                continue;
+            }
+            $attributeValueNames[] = [
+                '_attributes' => ['language' => $language['iso_code']],
+                '_cdata'      => $supplierName,
+            ];
+        }
+
+        if (count($attributeValueNames) === 0) {
+            return $attributesExport;
+        }
+        $attributeValuesExport[] = [
+            'code'   => 'supplier-name-' . $idSupplier,
+            'names' => [
+                'name' => $attributeValueNames,
+            ],
+        ];
+
+        $attributesExport['supplier_default'] = [
+            'code' => 'supplier_default',
+            'names' => [
+                'name' => $attributeNames,
+            ],
+            'values' => [
+                'value' => $attributeValuesExport,
+            ],
+        ];
+
+        return $attributesExport;
+    }
+
+    /**
+     * @param Product $product
      * @param int|null $idCombination
      * @return array
      */
@@ -1423,7 +1578,7 @@ class CatalogExportTransformer extends AbstractTransformer
         }
 
         $attributeValuesExport = [
-            'code'   => $attributeValue,
+            'code'   => 'available-for-order-' . $attributeValue,
             'names' => [
                 'name' => $attributeValueNames,
             ],
