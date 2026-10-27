@@ -42,13 +42,13 @@ class EffectConnect_Marketplaces extends Module
     {
         $this->name                     = 'effectconnect_marketplaces';
         $this->tab                      = 'market_place';
-        $this->version                  = '4.2.4';
+        $this->version                  = '4.2.5';
         $this->author                   = 'EffectConnect';
         $this->need_instance            = 1;
         $this->bootstrap                = true;
         $this->ps_versions_compliancy   = [
             'min'   => '8.0.0',
-            'max'   => '9.1.99'
+            'max'   => '9.2.99'
         ];
 
         parent::__construct();

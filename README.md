@@ -67,6 +67,7 @@ When setting up cron tasks make sure to use the correct PHP version that matches
 | Prestashop 8.1.4+  | PHP 8.0 - 8.2   |
 | Prestashop 9.0     | PHP 8.1 - 8.4   |
 | Prestashop 9.1     | PHP 8.1 - 8.5   |
+| Prestashop 9.2     | PHP 8.1 - 8.5   |
 
 Prestashop 1.7 is no longer actively supported. The last version can be found in the read-only repository of the [EffectConnect Marketplaces - Prestashop 1.7 plugin](https://github.com/EffectConnect/MarketplacesPluginPS17 "EffectConnect Marketplaces - Prestashop 1.7 plugin").
 
