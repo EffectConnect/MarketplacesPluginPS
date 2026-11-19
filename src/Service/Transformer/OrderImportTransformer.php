@@ -214,8 +214,8 @@ class OrderImportTransformer extends AbstractTransformer
             // Create new customer.
             $customer            = new Customer();
             $customer->email     = $emailAddress;
-            $customer->firstname = $this->convertCustomerName($order->getBillingAddress()->getFirstName());
-            $customer->lastname  = $this->convertCustomerName($order->getBillingAddress()->getLastName());
+            $customer->firstname = $this->sanitizeCustomerName($order->getBillingAddress()->getFirstName());
+            $customer->lastname  = $this->sanitizeCustomerName($order->getBillingAddress()->getLastName());
             $customer->passwd    = md5(Tools::passwdGen(8, 'RANDOM'));
             $customer->id_gender = $this->getGender($order);
 
@@ -252,8 +252,8 @@ class OrderImportTransformer extends AbstractTransformer
         $address              = new Address();
         $address->id_customer = $customer->id;
         $address->alias       = ($effectConnectAddress instanceof EffectConnectBillingAddress ? 'billing_' : 'shipping_') . time();
-        $address->firstname   = $effectConnectAddress->getFirstName();
-        $address->lastname    = $effectConnectAddress->getLastName();
+        $address->firstname   = $this->sanitizeCustomerName($effectConnectAddress->getFirstName());
+        $address->lastname    = $this->sanitizeCustomerName($effectConnectAddress->getLastName());
         $address->company     = $effectConnectAddress->getCompany();
         $address->postcode    = $effectConnectAddress->getZipCode();
         $address->phone       = $effectConnectAddress->getPhone();
@@ -752,16 +752,33 @@ class OrderImportTransformer extends AbstractTransformer
     }
 
     /**
-     * For customer names, only letters and the dot (.) character, followed by a space, are allowed.
-     * Let's replace a dot following by a non-space character by a dot following by a space character.
+     * Remove characters that PrestaShop rejects for customer names.
+     * An empty result is left empty so PrestaShop can reject it as before.
      *
      * @param string $name
      * @return string
      */
-    public function convertCustomerName(string $name) {
-        return preg_replace_callback('~\.([^ ])~', function ($matches) {
-            return '. ' . $matches[1];
-        }, $name);
+    public function sanitizeCustomerName(string $name): string
+    {
+        // Replace PrestaShop-forbidden characters and digits with spaces to keep neighboring words separate.
+        $name = preg_replace('~[0-9!<>,;?=+()/\\\\@#"°*`{}_^$%:¤\[\]|]+~u', ' ', $name);
+        if ($name === null) {
+            throw new \InvalidArgumentException('Customer name must be valid UTF-8.');
+        }
+
+        // Add a space after periods followed immediately by another character, as required by PrestaShop.
+        $name = preg_replace('~\.(?=\S)~u', '. ', $name);
+        if ($name === null) {
+            throw new \InvalidArgumentException('Customer name must be valid UTF-8.');
+        }
+
+        // Collapse consecutive whitespace characters into a single space.
+        $name = preg_replace('~\s+~u', ' ', $name);
+        if ($name === null) {
+            throw new \InvalidArgumentException('Customer name must be valid UTF-8.');
+        }
+
+        return trim($name);
     }
 
     /**
